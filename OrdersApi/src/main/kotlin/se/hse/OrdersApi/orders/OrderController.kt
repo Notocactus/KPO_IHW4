@@ -69,7 +69,7 @@ class OrderController (val orderService: OrderService) {
                     validate(resp.toInt())
                 }
             }
-            ResponseEntity.ok(resp.toString())
+            ResponseEntity.ok("Order created successfully")
         } catch (e: Exception) {
             ResponseEntity<String>(e.message, HttpStatus.BAD_REQUEST)
         }
