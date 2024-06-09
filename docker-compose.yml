@@ -1,0 +1,53 @@
+version: '3.1'
+services:
+  auth-service:
+    container_name: auth-service
+    build: AuthApi/
+    ports:
+      - "8080:8080"
+    depends_on:
+      - database1
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://database1:5432/AuthDatabase
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=none
+
+  orders-service:
+    container_name: orders-service
+    build: OrdersApi/
+    ports:
+      - "8081:8081"
+    depends_on:
+      - database2
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://database2:5432/OrdersDatabase
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=none
+
+  database1:
+    image: postgres:13
+    build:
+      context: ./
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_DB=AuthDatabase
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - ./initDatabase1:/docker-entrypoint-initdb.d
+
+  database2:
+    image: postgres:13
+    build:
+      context: ./
+    ports:
+      - "5434:5432"
+    environment:
+      - POSTGRES_DB=OrdersDatabase
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - ./initDatabase2:/docker-entrypoint-initdb.d
