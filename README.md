@@ -16,3 +16,8 @@ port: 8081
 
 Для создания заказа необходимо сначала создать объекты станций с помощью /stations/add
 
+Spring Web – включение RESTful web, использование spring MVC
+Spring Data JPA – Хранение данные в SQL-хранилищах с помощью Java Persistence API, используя Spring Data и Hibernate.
+Lombok – Библиотека аннотаций Java, которая помогает сократить количество шаблонного кода.
+PostgreSQL Driver – Драйвер JDBC и R2DBC, который позволяет Java-программам подключаться к базе данных PostgreSQL, используя стандартный, независимый от базы данных код Java.
+Docker
