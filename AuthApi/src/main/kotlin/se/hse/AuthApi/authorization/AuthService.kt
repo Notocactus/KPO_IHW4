@@ -17,27 +17,10 @@ import java.util.regex.Pattern
 @Service
 class AuthService(private val userRepository: UserRepository, private  val sessionRepository: SessionRepository) {
 
-    val pattern: Pattern = Pattern.compile("^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@" +
-            "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$")
 
-    fun emailValidate(email: String): Boolean {
-        return pattern.matcher(email).matches()
-    }
-
-    fun passwordValidate(password: String): Boolean {
-        return password.length >= 8 &&
-                password.contains(Regex("[A-Z]")) && password.contains(Regex("[a-z]")) &&
-                password.contains(Regex("[0-9]")) && password.contains(Regex("[!@#$%^&*+.,-]"))
-    }
 
     @Transactional
     fun registerUser(user: UserDto): String{
-        if (!emailValidate(user.email)){
-            throw IllegalAccessException("Incorrect Email")
-        }
-        if (!passwordValidate(user.password) ){
-            throw IllegalAccessException("Incorrect password.\n The password must consist of at least eight characters, including letters of both cases, digits and special characters (!@#$%^&*+.,-)")
-        }
         if (userRepository.findByEmail(user.email) != null){
             throw IllegalAccessException("The user is already registered with this email")
         }
@@ -51,12 +34,6 @@ class AuthService(private val userRepository: UserRepository, private  val sessi
     @Transactional
     fun login(user: LoginUserDto): String {
         removeExpiredTokens()
-        if (!emailValidate(user.email)){
-            throw IllegalAccessException("Incorrect Email")
-        }
-        if (!passwordValidate(user.password) ){
-            throw IllegalAccessException("Incorrect password.\n The password must consist of at least eight characters, including letters of both cases, digits and special characters (!@#$%^&*+.,-)")
-        }
         userRepository.findByEmail(user.email)?.id
             ?: throw IllegalAccessException("The user doesn't exist with this email")
 

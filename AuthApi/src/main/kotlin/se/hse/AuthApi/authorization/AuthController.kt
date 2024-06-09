@@ -11,13 +11,34 @@ import org.springframework.web.bind.annotation.RestController
 import se.hse.AuthApi.authorization.users.LoginUserDto
 import se.hse.AuthApi.authorization.sessions.SessionDto
 import se.hse.AuthApi.authorization.users.UserDto
+import java.util.regex.Pattern
 
 @RestController
 @RequestMapping("/user")
 class AuthController(val authService: AuthService) {
 
+    val pattern: Pattern = Pattern.compile("^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@" +
+            "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$")
+
+    fun validateEmail(email: String): Boolean {
+        return pattern.matcher(email).matches()
+    }
+
+    fun validatePassword(password: String): Boolean {
+        return password.length >= 8 &&
+                password.contains(Regex("[A-Z]")) && password.contains(Regex("[a-z]")) &&
+                password.contains(Regex("[0-9]")) && password.contains(Regex("[!@#$%^&*+.,-]"))
+    }
+
     @PostMapping("/register")
     fun registerUser(@RequestBody user: UserDto): ResponseEntity<String>{
+        if (!validateEmail(user.email)){
+            ResponseEntity<String>("Incorrect Email", HttpStatus.BAD_REQUEST)
+        }
+        if (!validatePassword(user.password) ){
+            ResponseEntity<String>("Incorrect password.\n The password must consist of at least eight characters, " +
+                    "including letters of both cases, digits and special characters (!@#$%^&*+.,-)", HttpStatus.BAD_REQUEST)
+        }
         return try {
             val resp = authService.registerUser(user)
             ResponseEntity.ok(resp)
@@ -29,6 +50,13 @@ class AuthController(val authService: AuthService) {
     @PostMapping("/login")
     fun login(@RequestBody loginUserDto: LoginUserDto): ResponseEntity<String>{
         return try {
+            if (!validateEmail(loginUserDto.email)){
+                ResponseEntity<String>("Incorrect Email", HttpStatus.BAD_REQUEST)
+            }
+            if (!validatePassword(loginUserDto.password) ){
+                ResponseEntity<String>("Incorrect password.\n The password must consist of at least eight characters, " +
+                        "including letters of both cases, digits and special characters (!@#$%^&*+.,-)", HttpStatus.BAD_REQUEST)
+            }
             val resp = authService.login(loginUserDto)
             ResponseEntity.ok(resp)
         }
